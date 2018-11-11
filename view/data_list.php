@@ -27,21 +27,6 @@ $data_list = $action->getPhysicalDataList($user_id);
                 <td><?php echo nl2br($post["basal_metabolic_rate"]); ?></td>
                 <td><?php echo nl2br($post["bmi"]); ?></td>
                 <td><?php echo $post["created_at"]; ?></td>
-                <td align="center" valign="middle">
-                    <form action="./index.php" method="post">
-                        <input type="hidden" name="user_id" value="edit">
-                        <input type="hidden" name="data_id" value="<?php echo $post["data_id"]; ?>">
-                        <input type="submit" value="確認">
-                    </form>
-                </td>
-                <!--				<td align="center" valign="middle">-->
-                <!--					<form action="./index.php" method="post">-->
-                <!--						<input type="hidden" name="user_id" value="delete">-->
-                <!--						<input type="hidden" name="data_id" value="-->
-                <?php //echo $post["data_id"];?><!--">-->
-                <!--						<input type="submit" value="削除">-->
-                <!--					</form>-->
-                <!--				</td>-->
             </tr>
         <?php } ?>
     </table>
