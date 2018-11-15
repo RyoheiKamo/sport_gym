@@ -1,3 +1,9 @@
+<?php
+
+//user_id取得
+$_POST['user_id'] = $_SESSION['user_id'];
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,6 +52,11 @@
 <form action="./index.php" method="post">
     <input type="hidden" name="event_command" value="data_list">
     <input type="submit" value="確認">
+</form>
+<hr>
+<form action="./index.php" method="post">
+    <input type="hidden" name="event_command" value="logout">
+    <input type="submit" value="ログアウト">
 </form>
 </body>
 </html>

@@ -14,31 +14,31 @@ $post_data = $action->getPhysicalData($data_id);
 <!-- 入力エリア -->
 <div class="input_area">
     <form action="./index.php" method="post" id="contact_form">
-        <dl class="name">
+        <dl class="weight">
             <dt>体重</dt>
             <dd><?php echo $post_data[0]["weight"]; ?>" step="0.1"></dd>
         </dl>
-        <dl class="name">
+        <dl class="fat_percentage">
             <dt>体脂肪</dt>
             <dd><?php echo $post_data[0]["fat_percentage"]; ?>" step="0.1"></dd>
         </dl>
-        <dl class="name">
+        <dl class="muscle_mass">
             <dt>筋肉量</dt>
             <dd><?php echo $post_data[0]["muscle_mass"]; ?>" step="0.1"></dd>
         </dl>
-        <dl class="name">
+        <dl class="water_content">
             <dt>体水分量</dt>
             <dd><?php echo $post_data[0]["water_content"]; ?>" step="0.1"></dd>
         </dl>
-        <dl class="name">
+        <dl class="visceral_fat">
             <dt>内臓脂肪</dt>
             <dd><?php echo $post_data[0]["visceral_fat"]; ?>" step="0.1"></dd>
         </dl>
-        <dl class="name">
+        <dl class="basal_metabolic_rate">
             <dt>基礎代謝量</dt>
             <dd><?php echo $post_data[0]["basal_metabolic_rate"]; ?>" step="0.1""></dd>
         </dl>
-        <dl class="name">
+        <dl class="bmi">
             <dt>BMI</dt>
             <dd><?php echo $post_data[0]["bmi"]; ?>" step="0.1"></dd>
         </dl>

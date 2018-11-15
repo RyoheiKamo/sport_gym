@@ -40,7 +40,7 @@ class getFormAction
                 'INSERT INTO user_users (member_id, password) VALUES (:member_id, :password)'
             );
             $smt->bindParam(':member_id', $data['member_id'], PDO::PARAM_INT);
-            $smt->bindParam(':user_id', $data['password'], PDO::PARAM_INT);
+            $smt->bindParam(':password', $data['password'], PDO::PARAM_INT);
             $smt->execute();
 
         } catch (PDOException $e) {
@@ -62,15 +62,33 @@ class getFormAction
                 'SELECT user_id FROM user_users  WHERE member_id = :member_id AND password = :password'
             );
             $smt->bindParam(':member_id', $data['member_id'], PDO::PARAM_INT);
-            $smt->bindParam(':user_id', $data['password'], PDO::PARAM_INT);
+            $smt->bindParam(':password', $data['password'], PDO::PARAM_INT);
             $smt->execute();
             // 実行結果を配列に返す。
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
-            return $result;
+
+            session_start(['cookie_lifetime' => 3600,]);
+
+            if (!isset($_SESSION['user_id']))
+            {
+                $_SESSION['user_id'] = $result[0]['user_id'];
+            }
 
         } catch (PDOException $e) {
             echo 'ログインに失敗しました。' . $e->getMessage();
         }
+
+    }
+
+    /**
+     * ログアウトする
+     *
+     */
+    function getLogout()
+    {
+        //セッションの終了
+        session_start();
+        unset($_SESSION['user_id']);
     }
 
     /**
@@ -105,6 +123,7 @@ class getFormAction
      */
     function setPhysicalData($data)
     {
+        var_dump($data['user_id']);exit;
         try {
             // データの保存
             $smt = $this->pdo->prepare(
@@ -128,10 +147,10 @@ class getFormAction
     /**
      * データを更新する
      *
-     * @param array $data
      * @param int $data_id
+     * @param array $data
      */
-    function updatePhysicalData($data, $data_id)
+    function updatePhysicalData($data_id, $data)
     {
         try {
             // データの更新

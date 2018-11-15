@@ -36,7 +36,7 @@ switch ($event_command) {
             $action->setPhysicalData($_POST);
             require("./view/data_list.php");
         } else {
-            $action->updatePhysicalData($_POST, $data_id);
+            $action->updatePhysicalData($data_id, $_POST);
             require("./view/data_list.php");
         }
         break;
@@ -54,7 +54,7 @@ switch ($event_command) {
 
     // データ更新
     case 'edit_save':
-        $action->updatePhysicalData($_POST, $data_id);
+        $action->updatePhysicalData($data_id, $_POST);
         require("./view/data_list.php");
         break;
 
@@ -68,6 +68,12 @@ switch ($event_command) {
     // 投稿に戻る
     case 'back_to_post':
         require("./view/post.php");
+        break;
+
+    // ログアウト
+    case 'logout':
+        $action->getLogout();
+        require("./view/login.php");
         break;
 
     default:
