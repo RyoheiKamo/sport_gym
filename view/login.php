@@ -1,3 +1,6 @@
+<?php
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,23 +8,28 @@
     <title>ログイン</title>
 </head>
 <body>
-<h1>ログイン</h1>
-<!-- 入力エリア -->
-<div class="input_area">
-    <form action="./index.php" method="post" id="contact_form">
-        <dl class="member_id">
-            <dt>会員ID</dt>
-            <dd><input type="number" name="member_id" value="" step="0.1"></dd>
-        </dl>
-        <dl class="password">
-            <dt>パスワード</dt>
-            <dd><input type="number" name="password" value="" step="0.1"></dd>
-        </dl>
-        <input type="hidden" value="login">
-        <input type="submit" value="ログイン">
-        <input type="hidden" value="login_first">
-        <input type="submit" value="初回ログイン">
-    </form>
-</div>
+<hr>
+<p>ログイン</p>
+<!-- エラーエリア -->
+<?php if (!empty($errm)) {?>
+    <div class="error">
+        <?php foreach($errm as $key => $value) {
+            echo $value;
+        }?>
+    </div>
+<?php }?>
+<form action="./index.php" method="post">
+    <input type="number" name="member_id">
+    <input type="number" name="password">
+    <input type="hidden" name="event_command" value="login">
+    <input type="submit" value="ログイン">
+</form>
+<form action="./index.php" method="post">
+    <input type="number" name="member_id">
+    <input type="number" name="password">
+    <input type="hidden" name="event_command" value="login_first">
+    <input type="submit" value="初回ログイン">
+</form>
+
 </body>
 </html>

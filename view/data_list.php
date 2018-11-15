@@ -32,7 +32,9 @@ $data_list = $action->getPhysicalDataList($user_id);
     </table>
 <?php } ?>
 <!-- // 投稿表示エリア -->
-<hr>
-<p><a href="./">投稿に戻る</a></p>
+<form action="./index.php" method="post">
+    <input type="hidden" name="event_command" value="back_to_post">
+    <input type="submit" value="投稿に戻る">
+</form>
 </body>
 </html>

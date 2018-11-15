@@ -37,14 +37,14 @@
             <dt>BMI</dt>
             <dd><input type="number" name="bmi" value="" step="0.1"></dd>
         </dl>
-        <input type="hidden" name="user_Id" value="save">
+        <input type="hidden" name="event_command" value="save">
         <input type="submit" value="送信">
     </form>
 </div>
 <!-- //入力エリア -->
 <hr>
 <form action="./index.php" method="post">
-    <input type="hidden" name="user_id" value="data_list">
+    <input type="hidden" name="event_command" value="data_list">
     <input type="submit" value="確認">
 </form>
 </body>
