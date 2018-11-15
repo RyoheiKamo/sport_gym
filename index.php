@@ -5,18 +5,21 @@ require_once('./class/business/getFormAction.php');
 
 $action = new getFormAction();
 
+$event_command = null;
+
 $user_id = null;
 
+//イベントコマンド取得
+if (isset($_POST['event_command'])) {
+    $event_command = $_POST['event_command'];
+}
 
-switch ($user_id = null){
-    default:
-        require("./view/login.php");
-        break;
+switch ($event_command) {
 
     //初回ログイン
     case 'login_first':
         $action->getLoginFirst($_POST);
-        require("./view/post.php");
+        require("./view/login.php");
         break;
 
     //ログイン
@@ -24,14 +27,6 @@ switch ($user_id = null){
         $action->getLogin($_POST);
         require("./view/post.php");
         break;
-}
-
-//ユーザID取得
-if (isset($_POST['$user_id'])) {
-    $user_id = $_POST['$user_id'];
-}
-
-switch ($user_id) {
 
     // DBsave
     case 'save':
@@ -69,5 +64,15 @@ switch ($user_id) {
         $action->deletePhysicalData($data_id);
         require("./view/data_list.php");
         break;
+
+    // 投稿に戻る
+    case 'back_to_post':
+        require("./view/post.php");
+        break;
+
+    default:
+        require("./view/login.php");
+        break;
+
 }
 
