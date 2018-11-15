@@ -10,16 +10,20 @@ class getFormAction
     function __construct()
     {
         try {
-            $db = new PDO(PDO_DSN, DATABASE_USER, DATABASE_PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
-
-            // DBエラー時の例外を設定する
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // フェッチモードを設定する：オブジェクトとしての行
-            $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-
+            $this->pdo = new PDO(
+                PDO_DSN,
+                DATABASE_USER,
+                DATABASE_PASSWORD,
+                array(
+                    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    )
+            );
+            $this->pdo->prepare('use saitamacode_wpdemo')->execute();
         } catch (PDOException $e) {
-            print 'データベースにアクセスできませんでした。' . $e->getMessage();
-            exit();
+            echo 'データベースにアクセスできませんでした。' . $e->getMessage();
+            die();
         }
     }
 
@@ -27,7 +31,6 @@ class getFormAction
      * ログインデータを新規作成する
      *
      * @param array $data
-     * @return array
      */
     function getLoginFirst($data)
     {
@@ -39,16 +42,11 @@ class getFormAction
             $smt->bindParam(':member_id', $data['member_id'], PDO::PARAM_INT);
             $smt->bindParam(':user_id', $data['password'], PDO::PARAM_INT);
             $smt->execute();
-            $count = $smt->rowcount();
 
-            if ($count == 1) {
-                $this->getLogin($data);
-            }
         } catch (PDOException $e) {
             echo '初回ログインに失敗しました。' . $e->getMessage();
         }
     }
-
 
     /**
      * ニックネームとパスワードを確認する
@@ -68,14 +66,12 @@ class getFormAction
             $smt->execute();
             // 実行結果を配列に返す。
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
-
             return $result;
 
         } catch (PDOException $e) {
             echo 'ログインに失敗しました。' . $e->getMessage();
         }
     }
-
 
     /**
      * 最終更新日を取得する
@@ -101,7 +97,6 @@ class getFormAction
             echo '最終投稿日時が取得ができませんでした。' . $e->getMessage();
         }
     }
-
 
     /**
      * データをDBに保存
@@ -178,7 +173,6 @@ class getFormAction
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
 
             return $result;
-
         } catch (PDOException $e) {
             echo 'データの読み込みが出来ませんでした。' . $e->getMessage();
         }
