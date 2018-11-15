@@ -6,4 +6,4 @@ define('DATABASE_USER','saitamacode_kamo');
 define('DATABASE_PASSWORD','triumph1');
 define('DATABASE_HOST','mysql5005.xserver.jp');
 
-define('PDO_DSN','mysql:host=DATABASE_HOST' . DATABASE_NAME .';host=' . DATABASE_HOST . '; charset=utf8');
+define('PDO_DSN','mysql:host=DATABASE_HOST' . DATABASE_NAME .';host=' . DATABASE_HOST);
