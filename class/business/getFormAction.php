@@ -56,28 +56,61 @@ class getFormAction
      */
     function getLogin($data)
     {
-        try {
-            // 登録データ取得
-            $smt = $this->pdo->prepare(
-                'SELECT user_id FROM user_users  WHERE member_id = :member_id AND password = :password'
-            );
-            $smt->bindParam(':member_id', $data['member_id'], PDO::PARAM_INT);
-            $smt->bindParam(':password', $data['password'], PDO::PARAM_INT);
-            $smt->execute();
-            // 実行結果を配列に返す。
-            $result = $smt->fetchAll(PDO::FETCH_ASSOC);
+        session_start(['cookie_lifetime' => 3600,]);
 
-            session_start(['cookie_lifetime' => 3600,]);
+        // エラーメッセージの初期化
+        $errorMessage = "";
 
-            if (!isset($_SESSION['user_id']))
-            {
-                $_SESSION['user_id'] = $result[0]['user_id'];
+        // ログインボタンが押された場合
+        if (isset($_POST["login"]))
+        {
+            // 1. ユーザIDの入力チェック
+            if (empty($_POST["member_id"]))
+            {  // emptyは値が空のとき
+                echo $errorMessage = '会員IDが未入力です。';
+            } else if (empty($_POST["password"])) {
+                echo $errorMessage = 'パスワードが未入力です。';
             }
 
-        } catch (PDOException $e) {
-            echo 'ログインに失敗しました。' . $e->getMessage();
-        }
+            if (!empty($_POST["member_id"]) && !empty($_POST["password"])) {
+                // 入力したユーザIDを格納
+                $member_id = $_POST["member_id"];
 
+                // 2. エラー処理
+                try {
+
+                    $stmt = $this->pdo->prepare('SELECT * FROM user_users WHERE name = ?');
+                    $stmt->execute(array($member_id));
+
+                    $password = $_POST["password"];
+
+                    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        if (password_verify($password, $row['password'])) {
+                            session_regenerate_id(true);
+
+                            // 入力したIDのユーザー名を取得
+                            $user_id = $row['user_id'];
+                            $sql = "SELECT * FROM user_users WHERE user_id = $user_id";  //入力したIDからユーザー名を取得
+                            $stmt = $this->pdo->query($sql);
+                            foreach ($stmt as $row) {
+                                $row['member_id'];  // ユーザー名
+                            }
+                            $_SESSION["USER_ID"] = $row['user_id'];
+                            exit();  // 処理終了
+                        } else {
+                            // 認証失敗
+                            echo $errorMessage = 'ユーザーIDあるいはパスワードに誤りがあります。';
+                        }
+                    } else {
+                        // 4. 認証成功なら、セッションIDを新規に発行する
+                        // 該当データなし
+                        echo $errorMessage = 'ユーザーIDあるいはパスワードに誤りがあります。';
+                    }
+                } catch (PDOException $e) {
+                    echo 'ログインに失敗しました。' . $e->getMessage();
+                }
+            }
+        }
     }
 
     /**
@@ -88,7 +121,17 @@ class getFormAction
     {
         //セッションの終了
         session_start();
-        unset($_SESSION['user_id']);
+        if (isset($_SESSION["NAME"])) {
+            echo $errorMessage = "ログアウトしました。";
+        } else {
+            echo $errorMessage = "セッションがタイムアウトしました。";
+        }
+
+        // セッションの変数のクリア
+        $_SESSION = array();
+
+        // セッションクリア
+        @session_destroy();
     }
 
     /**
@@ -123,7 +166,6 @@ class getFormAction
      */
     function setPhysicalData($data)
     {
-        var_dump($data['user_id']);exit;
         try {
             // データの保存
             $smt = $this->pdo->prepare(
