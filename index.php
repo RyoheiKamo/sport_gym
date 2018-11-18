@@ -30,28 +30,29 @@ switch ($event_command) {
 
     // DBsave
     case 'save':
-//        //最後の投稿データを取得する
-//        $last_post_data = $action->getPostLastDate($_POST['user_id']);
-//
-//        if (isset($last_post_data)) {
-//            if (date('Y-m-d', time()) == substr($last_post_data['created_at'], 0, 10)) {
-//                //最後の投稿データの日付が本日と同一の場合ばアップデート
-//                $action->updatePhysicalData($last_post_data['data_id'], $_POST);
-//                require("./view/post.php");
-//                //それ以外の場合は新規作成
-//            } else {
-//                $action->setPhysicalData($_POST);
-//                require("./view/post.php");
-//            }
-//        } else {
-//            $action->setPhysicalData($_POST);
-//            require("./view/post.php");
-//        }
-//        break;
-    case 'save':
-        $action->setPhysicalData();
-        require("./view/post.php");
+        //最後の投稿データを取得する
+        $last_post_data = $action->getPostLastDate();
+//var_dump($last_post_data);
+        if (isset($last_post_data)) {
+            if (date('Y-m-d', time()) == substr($last_post_data[0]['created_at'], 0, 10)) {
+                //最後の投稿データの日付が本日と同一の場合ばアップデート
+                $action->updatePhysicalData($last_post_data[0]['data_id']);
+                require("./view/post.php");
+                //それ以外の場合は新規作成
+            } else {
+                $action->setPhysicalData();
+                require("./view/post.php");
+            }
+        } else {
+            $action->setPhysicalData();
+            require("./view/post.php");
+        }
         break;
+
+//    case 'save':
+//        $action->setPhysicalData();
+//        require("./view/post.php");
+//        break;
 
     // data list
     case 'data_list':
