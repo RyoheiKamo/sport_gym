@@ -27,7 +27,7 @@
 <form action="./index.php" method="post">
     <input type="number" name="member_id">
     <input type="number" name="password">
-    <input type="hidden" name="event_command" value="login_first">
+    <input type="hidden" name="event_command" value="signUp">
     <input type="submit" value="初回ログイン">
 </form>
 

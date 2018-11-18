@@ -17,28 +17,40 @@ if (isset($_POST['event_command'])) {
 switch ($event_command) {
 
     //初回ログイン
-    case 'login_first':
-        $action->getLoginFirst($_POST);
+    case 'signUp':
+        $action->signUp();
         require("./view/login.php");
         break;
 
     //ログイン
     case 'login':
-        $action->getLogin($_POST);
+        $action->getLogin();
         require("./view/post.php");
         break;
 
     // DBsave
     case 'save':
-        $last_date = $action->getPostLastDate($user_id)['created_at'];
-
-        if (date('Y-m-d', time()) != substr($last_date, 0, 10)) {
-            $action->setPhysicalData($_POST);
-            require("./view/data_list.php");
-        } else {
-            $action->updatePhysicalData($data_id, $_POST);
-            require("./view/data_list.php");
-        }
+//        //最後の投稿データを取得する
+//        $last_post_data = $action->getPostLastDate($_POST['user_id']);
+//
+//        if (isset($last_post_data)) {
+//            if (date('Y-m-d', time()) == substr($last_post_data['created_at'], 0, 10)) {
+//                //最後の投稿データの日付が本日と同一の場合ばアップデート
+//                $action->updatePhysicalData($last_post_data['data_id'], $_POST);
+//                require("./view/post.php");
+//                //それ以外の場合は新規作成
+//            } else {
+//                $action->setPhysicalData($_POST);
+//                require("./view/post.php");
+//            }
+//        } else {
+//            $action->setPhysicalData($_POST);
+//            require("./view/post.php");
+//        }
+//        break;
+    case 'save':
+        $action->setPhysicalData();
+        require("./view/post.php");
         break;
 
     // data list
@@ -54,7 +66,7 @@ switch ($event_command) {
 
     // データ更新
     case 'edit_save':
-        $action->updatePhysicalData($data_id, $_POST);
+        $action->updatePhysicalData($data_id);
         require("./view/data_list.php");
         break;
 

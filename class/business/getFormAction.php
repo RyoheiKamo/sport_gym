@@ -2,6 +2,7 @@
 
 class getFormAction
 {
+
     public $pdo;
 
     /**
@@ -30,85 +31,74 @@ class getFormAction
     /**
      * ログインデータを新規作成する
      *
-     * @param array $data
      */
-    function getLoginFirst($data)
+    function signUp()
     {
-        try {
-            // 登録データ取得
-            $smt = $this->pdo->prepare(
-                'INSERT INTO user_users (member_id, password) VALUES (:member_id, :password)'
-            );
-            $smt->bindParam(':member_id', $data['member_id'], PDO::PARAM_INT);
-            $smt->bindParam(':password', $data['password'], PDO::PARAM_INT);
-            $smt->execute();
+        if (empty($_POST["member_id"])) {  // 値が空のとき
+            echo $errorMessage = 'ユーザーIDが未入力です。';
+        } else if (empty($_POST["password"])) {
+            echo $errorMessage = 'パスワードが未入力です。';
+        }
 
-        } catch (PDOException $e) {
-            echo '初回ログインに失敗しました。' . $e->getMessage();
+        if (!empty($_POST["member_id"]) && !empty($_POST["password"])) {
+            // 入力したユーザIDとパスワードを格納
+            $member_id = $_POST["member_id"];
+            $password = $_POST["password"];
+
+            try {
+                $smt = $this->pdo->prepare(
+                    'INSERT INTO user_users (member_id, password) VALUES (:member_id, :password)'
+                );
+                $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
+                $smt->bindParam(':password', $password, PDO::PARAM_INT);
+                $smt->execute();
+
+                echo $signUpMessage = '登録が完了しました。';  //
+            } catch (PDOException $e) {
+                echo $errorMessage = 'データベースエラー';
+            }
         }
     }
 
     /**
      * ニックネームとパスワードを確認する
      *
-     * @param array $data
-     * @return array
      */
-    function getLogin($data)
+    function getLogin()
     {
         session_start(['cookie_lifetime' => 3600,]);
 
         // エラーメッセージの初期化
         $errorMessage = "";
 
-        // ログインボタンが押された場合
-        if (isset($_POST["login"]))
-        {
-            // 1. ユーザIDの入力チェック
-            if (empty($_POST["member_id"]))
-            {  // emptyは値が空のとき
-                echo $errorMessage = '会員IDが未入力です。';
-            } else if (empty($_POST["password"])) {
-                echo $errorMessage = 'パスワードが未入力です。';
-            }
+        // 1. ユーザIDの入力チェック
+        if (empty($_POST["member_id"])) {  // emptyは値が空のとき
+            echo $errorMessage = '会員IDが未入力です。';
+        } else if (empty($_POST["password"])) {
+            echo $errorMessage = 'パスワードが未入力です。';
+        }
 
-            if (!empty($_POST["member_id"]) && !empty($_POST["password"])) {
-                // 入力したユーザIDを格納
-                $member_id = $_POST["member_id"];
+        if (!empty($_POST["member_id"]) && !empty($_POST["password"])) {
+            // 入力したユーザIDを格納
+            $member_id = $_POST["member_id"];
+            $password = $_POST["password"];
 
-                // 2. エラー処理
-                try {
+            // 2. エラー処理
+            try {
+                $smt = $this->pdo->prepare(
+                    'SELECT user_id FROM user_users WHERE member_id = :member_id AND password = :password'
+                );
+                $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
+                $smt->bindParam(':password', $password, PDO::PARAM_INT);
+                $smt->execute();
 
-                    $stmt = $this->pdo->prepare('SELECT * FROM user_users WHERE name = ?');
-                    $stmt->execute(array($member_id));
+                // 実行結果を配列に返す。
+                $result = $smt->fetchAll(PDO::FETCH_ASSOC);
+                $_SESSION['USER_ID'] = $result[0]['user_id'];
 
-                    $password = $_POST["password"];
 
-                    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        if (password_verify($password, $row['password'])) {
-                            session_regenerate_id(true);
-
-                            // 入力したIDのユーザー名を取得
-                            $user_id = $row['user_id'];
-                            $sql = "SELECT * FROM user_users WHERE user_id = $user_id";  //入力したIDからユーザー名を取得
-                            $stmt = $this->pdo->query($sql);
-                            foreach ($stmt as $row) {
-                                $row['member_id'];  // ユーザー名
-                            }
-                            $_SESSION["USER_ID"] = $row['user_id'];
-                            exit();  // 処理終了
-                        } else {
-                            // 認証失敗
-                            echo $errorMessage = 'ユーザーIDあるいはパスワードに誤りがあります。';
-                        }
-                    } else {
-                        // 4. 認証成功なら、セッションIDを新規に発行する
-                        // 該当データなし
-                        echo $errorMessage = 'ユーザーIDあるいはパスワードに誤りがあります。';
-                    }
-                } catch (PDOException $e) {
-                    echo 'ログインに失敗しました。' . $e->getMessage();
-                }
+            } catch (PDOException $e) {
+                echo 'ログインに失敗しました。' . $e->getMessage();
             }
         }
     }
@@ -142,12 +132,14 @@ class getFormAction
      */
     function getPostLastDate($user_id)
     {
+        $user_id_num = (int)$user_id;
+
         try {
             // データの保存
             $smt = $this->pdo->prepare(
-                'SELECT data_id, created_at from user_physical_datas where user_id = :user_id order by created_at desc limit 1'
+                'SELECT data_id, created_at FROM user_physical_datas WHERE user_id = :user_id ORDER BY created_at DESC limit 1'
             );
-            $smt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $smt->bindParam(':user_id', $user_id_num, PDO::PARAM_INT);
             $smt->execute();
 
             // 実行結果を配列に返す。
@@ -162,23 +154,24 @@ class getFormAction
     /**
      * データをDBに保存
      *
-     * @param array $data
      */
-    function setPhysicalData($data)
+    function setPhysicalData()
     {
+        session_start();
+
         try {
             // データの保存
             $smt = $this->pdo->prepare(
                 'INSERT INTO user_physical_datas (user_id,weight,fat_percentage,muscle_mass,water_content,visceral_fat,basal_metabolic_rate,bmi,created_at,updated_at, delete_flag) VALUES (:user_id,:weight,:fat_percentage,:muscle_mass,:water_content,:visceral_fat,:basal_metabolic_rate,:bmi,now(),now(),0)'
             );
-            $smt->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
-            $smt->bindParam(':weight', $data['weight'], PDO::PARAM_STR);
-            $smt->bindParam(':fat_percentage', $data['fat_percentage'], PDO::PARAM_STR);
-            $smt->bindParam(':muscle_mass', $data['muscle_mass'], PDO::PARAM_STR);
-            $smt->bindParam(':water_content', $data['water_content'], PDO::PARAM_STR);
-            $smt->bindParam(':visceral_fat', $data['visceral_fat'], PDO::PARAM_STR);
-            $smt->bindParam(':basal_metabolic_rate', $data['basal_metabolic_rate'], PDO::PARAM_STR);
-            $smt->bindParam(':bmi', $data['bmi'], PDO::PARAM_STR);
+            $smt->bindParam(':user_id', $_SESSION['USER_ID'], PDO::PARAM_INT);
+            $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
+            $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
+            $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
+            $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
+            $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
+            $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
+            $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
             $smt->execute();
 
         } catch (PDOException $e) {
@@ -190,9 +183,8 @@ class getFormAction
      * データを更新する
      *
      * @param int $data_id
-     * @param array $data
      */
-    function updatePhysicalData($data_id, $data)
+    function updatePhysicalData($data_id)
     {
         try {
             // データの更新
@@ -200,13 +192,13 @@ class getFormAction
                 'UPDATE  user_physical_datas SET weight = :weight,fat_percentage = :fat_percentage,muscle_mass = :muscle_mass,water_content = :water_content,visceral_fat = :visceral_fat,basal_metabolic_rate = :basal_metabolic_rate,bmi = :bim,updated_at = now() WHERE data_id = data_id)'
             );
             $smt->bindParam(':data_id', $data_id, PDO::PARAM_INT);
-            $smt->bindParam(':weight', $data['weight'], PDO::PARAM_STR);
-            $smt->bindParam(':fat_percentage', $data['fat_percentage'], PDO::PARAM_STR);
-            $smt->bindParam(':muscle_mass', $data['muscle_mass'], PDO::PARAM_STR);
-            $smt->bindParam(':water_content', $data['water_content'], PDO::PARAM_STR);
-            $smt->bindParam(':visceral_fat', $data['visceral_fat'], PDO::PARAM_STR);
-            $smt->bindParam(':basal_metabolic_rate', $data['basal_metabolic_rate'], PDO::PARAM_STR);
-            $smt->bindParam(':bmi', $data['bmi'], PDO::PARAM_STR);
+            $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
+            $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
+            $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
+            $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
+            $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
+            $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
+            $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
             $smt->execute();
 
         } catch (PDOException $e) {
@@ -226,7 +218,7 @@ class getFormAction
         try {
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas ORDER BY created_at DESC limit 20 WHERE user_id = :user_id AND delete_flag = 0'
+                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
             );
             $smt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
             $smt->execute();
@@ -250,7 +242,7 @@ class getFormAction
         try {
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas WHERE data_id = :data_id AND delete_flag = 0'
+                'SELECT * FROM user_physical_datas WHERE data_id = :data_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
             );
             $smt->bindParam(':data_id', $data_id, PDO::PARAM_INT);
             $smt->execute();

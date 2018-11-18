@@ -1,7 +1,6 @@
 <?php
 
-//user_id取得
-$_POST['user_id'] = $_SESSION['user_id'];
+session_start();
 
 ?>
 <!DOCTYPE html>

@@ -1,7 +1,8 @@
 <?php
 
+session_start();
 // 登録データ取得
-$data_list = $action->getPhysicalDataList($user_id);
+$data_list = $action->getPhysicalDataList($_SESSION['USER_ID']);
 
 ?>
 <!DOCTYPE html>
