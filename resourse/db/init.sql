@@ -2,8 +2,8 @@ drop table if exists `user_users` cascade;
 
 create table `user_users` (
   `user_id` INT unsigned not null auto_increment comment 'ユーザID'
-  , `member_id` int(20)  not null comment '会員ID'
-  , `password` int(20) unique not null comment 'Password（電話番号）'
+  , `member_id` VARCHAR(255)  not null comment '会員ID'
+  , `password` VARCHAR(255) not null comment 'Password（電話番号）'
   , `client_id` VARCHAR(255) not null comment 'クライアントID'
   , `created_at` DATETIME default CURRENT_TIMESTAMP not null comment '登録日時'
   , `updated_at` DATETIME default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null comment '更新日時'
