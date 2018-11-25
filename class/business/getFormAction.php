@@ -10,6 +10,8 @@ class getFormAction
      */
     function __construct()
     {
+        date_default_timezone_set('Asia/Tokyo');
+
         try {
             $this->pdo = new PDO(
                 PDO_DSN,
@@ -96,7 +98,6 @@ class getFormAction
                 $result = $smt->fetchAll(PDO::FETCH_ASSOC);
                 $_SESSION['USER_ID'] = $result[0]['user_id'];
 
-
             } catch (PDOException $e) {
                 echo 'ログインに失敗しました。' . $e->getMessage();
             }
@@ -111,6 +112,7 @@ class getFormAction
     {
         //セッションの終了
         session_start();
+
         if (isset($_SESSION["NAME"])) {
             echo $errorMessage = "ログアウトしました。";
         } else {
@@ -156,31 +158,25 @@ class getFormAction
      */
     function setPhysicalData()
     {
-       session_start();
+        session_start();
 
-        if (!empty($_POST['weight']) && !empty($_POST['fat_percentage']) && !empty($_POST['muscle_mass']) && !empty($_POST['water_content'])
-        && !empty($_POST['visceral_fat']) && !empty($_POST['basal_metabolic_rate']) && !empty($_POST['bmi']))
-        {
-            try {
-                // データの保存
-                $smt = $this->pdo->prepare(
-                    'INSERT INTO user_physical_datas (user_id,weight,fat_percentage,muscle_mass,water_content,visceral_fat,basal_metabolic_rate,bmi,created_at,updated_at, delete_flag) VALUES (:user_id,:weight,:fat_percentage,:muscle_mass,:water_content,:visceral_fat,:basal_metabolic_rate,:bmi,now(),now(),0)'
-                );
-                $smt->bindParam(':user_id', $_SESSION['USER_ID'], PDO::PARAM_INT);
-                $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
-                $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
-                $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
-                $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
-                $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
-                $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
-                $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
-                $smt->execute();
+        try {
+            // データの保存
+            $smt = $this->pdo->prepare(
+                'INSERT INTO user_physical_datas (user_id,weight,fat_percentage,muscle_mass,water_content,visceral_fat,basal_metabolic_rate,bmi,created_at,updated_at, delete_flag) VALUES (:user_id,:weight,:fat_percentage,:muscle_mass,:water_content,:visceral_fat,:basal_metabolic_rate,:bmi,now(),now(),0)'
+            );
+            $smt->bindParam(':user_id', $_SESSION['USER_ID'], PDO::PARAM_INT);
+            $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
+            $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
+            $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
+            $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
+            $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
+            $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
+            $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
+            $smt->execute();
 
-            } catch (PDOException $e) {
-                echo 'データの入力ができませんでした。' . $e->getMessage();
-            }
-        } else {
-            echo $errorMessage = 'データが未入力です。';
+        } catch (PDOException $e) {
+            echo 'データの入力ができませんでした。' . $e->getMessage();
         }
     }
 
@@ -191,8 +187,6 @@ class getFormAction
      */
     function updatePhysicalData($data_id)
     {
-        if (!empty($_POST['weight']) && !empty($_POST['fat_percentage']) && !empty($_POST['muscle_mass']) && !empty($_POST['water_content'])
-            && !empty($_POST['visceral_fat']) && !empty($_POST['basal_metabolic_rate']) && !empty($_POST['bmi'])) {
             try {
                 // データの更新
                 $smt = $this->pdo->prepare(
@@ -211,9 +205,6 @@ class getFormAction
             } catch (PDOException $e) {
                 echo 'データの更新が出来ませんでした。' . $e->getMessage();
             }
-        } else {
-            echo $errorMessage = 'データが未入力です。';
-        }
     }
 
     /**
@@ -251,7 +242,7 @@ class getFormAction
         try {
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas WHERE data_id = :data_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
+                'SELECT * FROM user_physical_datas WHERE data_id = :data_id AND delete_flag = 0'
             );
             $smt->bindParam(':data_id', $data_id, PDO::PARAM_INT);
             $smt->execute();

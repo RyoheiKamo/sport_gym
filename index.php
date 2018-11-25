@@ -32,7 +32,7 @@ switch ($event_command) {
     case 'save':
         //最後の投稿データを取得する
         $last_post_data = $action->getPostLastDate();
-//var_dump($last_post_data);
+
         if (isset($last_post_data)) {
             if (date('Y-m-d', time()) == substr($last_post_data[0]['created_at'], 0, 10)) {
                 //最後の投稿データの日付が本日と同一の場合ばアップデート
