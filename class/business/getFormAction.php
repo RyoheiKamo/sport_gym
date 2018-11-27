@@ -76,8 +76,10 @@ class getFormAction
         // 1. ユーザIDの入力チェック
         if (empty($_POST["member_id"])) {  // emptyは値が空のとき
             echo $errorMessage = '会員IDが未入力です。';
+            exit;
         } else if (empty($_POST["password"])) {
             echo $errorMessage = 'パスワードが未入力です。';
+            exit;
         }
 
         if (!empty($_POST["member_id"]) && !empty($_POST["password"])) {
@@ -96,10 +98,16 @@ class getFormAction
 
                 // 実行結果を配列に返す。
                 $result = $smt->fetchAll(PDO::FETCH_ASSOC);
+                
+                if ($result[0]['user_id'] == null){
+                    echo $errorMessage = 'ログインに失敗しました。';
+                    exit;
+                }
+
                 $_SESSION['USER_ID'] = $result[0]['user_id'];
 
             } catch (PDOException $e) {
-                echo 'ログインに失敗しました。' . $e->getMessage();
+                echo 'データベースエラー' . $e->getMessage();
             }
         }
     }

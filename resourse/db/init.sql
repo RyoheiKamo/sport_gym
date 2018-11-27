@@ -13,7 +13,7 @@ create table `user_users` (
   , constraint `user_users_PKC` primary key (`user_id`)
 ) comment 'ユーザ:' ENGINE=InnoDB CHARACTER SET utf8mb4 ROW_FORMAT=DYNAMIC;
 
-drop table if exists `user_physical_dates` cascade;
+drop table if exists `user_physical_datas` cascade;
 
 create table `user_physical_datas` (
   `data_id` INT unsigned not null auto_increment comment 'データID'
