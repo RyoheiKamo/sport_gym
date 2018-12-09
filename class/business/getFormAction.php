@@ -98,7 +98,7 @@ class getFormAction
 
                 // 実行結果を配列に返す。
                 $result = $smt->fetchAll(PDO::FETCH_ASSOC);
-                
+
                 if ($result[0]['user_id'] == null){
                     echo $errorMessage = 'ログインに失敗しました。';
                     exit;
@@ -219,16 +219,23 @@ class getFormAction
      * データリストをDBから読み込み
      *
      * @param int $user_id
+     * @param int $term
      * @return array
      */
-    function getPhysicalDataList($user_id)
+    function getPhysicalDataList($user_id, $term)
     {
+        $now_time = date('Y-m-d H:i:s');
+
+        $term_time = date('Y-m-d H:i:s', time() - ($term * 24 * 60 * 60));
+
         try {
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
+                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 AND created_at BETWEEN :term_time AND :now_time ORDER BY created_at DESC'
             );
             $smt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $smt->bindParam(':term_time', $term_time, PDO::PARAM_STR);
+            $smt->bindParam(':now_time', $now_time, PDO::PARAM_STR);
             $smt->execute();
             // 実行結果を配列に返す。
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
