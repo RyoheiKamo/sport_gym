@@ -2,8 +2,8 @@ drop table if exists `user_users` cascade;
 
 create table `user_users` (
   `user_id` INT unsigned not null auto_increment comment 'ユーザID'
-  , `member_id` VARCHAR(255) unique not null comment '会員ID'
-  , `password` VARCHAR(255) not null comment 'Password（電話番号）'
+  , `member_id` VARCHAR(255) not null comment '会員ID(生年月日)'
+  , `password` VARCHAR(255) not null comment 'Password(電話番号)'
   , `client_id` VARCHAR(255) not null comment 'クライアントID'
   , `created_at` DATETIME default CURRENT_TIMESTAMP not null comment '登録日時'
   , `updated_at` DATETIME default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null comment '更新日時'
@@ -23,7 +23,7 @@ create table `user_physical_datas` (
   , `muscle_mass` DOUBLE(4,1) unsigned not null comment '筋肉量'
   , `water_content` DOUBLE(4,1) unsigned not null comment '体水分量'
   , `visceral_fat` DOUBLE(4,1) unsigned not null comment '内臓脂肪'
-  , `basal_metabolic_rate` DOUBLE(4,1) unsigned not null comment '基礎代謝量'
+  , `basal_metabolic_rate` DOUBLE(5,1) unsigned not null comment '基礎代謝量'
   , `bmi` DOUBLE(4,1) unsigned not null comment 'BMI'
   , `created_at` DATETIME default CURRENT_TIMESTAMP not null comment '投稿日時'
   , `updated_at` DATETIME default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null comment '更新日時'

@@ -21,7 +21,7 @@ class getFormAction
                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    )
+                )
             );
             $this->pdo->prepare('use saitamacode_wpdemo')->execute();
         } catch (PDOException $e) {
@@ -90,9 +90,9 @@ class getFormAction
             // 2. エラー処理
             try {
                 $smt = $this->pdo->prepare(
-                    'SELECT user_id FROM user_users WHERE member_id = :member_id AND password = :password'
+                    'SELECT user_id FROM user_users WHERE password = :password'
                 );
-                $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
+//                $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
                 $smt->bindParam(':password', $password, PDO::PARAM_INT);
                 $smt->execute();
 
@@ -195,47 +195,40 @@ class getFormAction
      */
     function updatePhysicalData($data_id)
     {
-            try {
-                // データの更新
-                $smt = $this->pdo->prepare(
-                    'UPDATE user_physical_datas SET weight = :weight,fat_percentage = :fat_percentage,muscle_mass = :muscle_mass,water_content = :water_content,visceral_fat = :visceral_fat,basal_metabolic_rate = :basal_metabolic_rate,bmi = :bmi,updated_at = now() WHERE data_id = :data_id'
-                );
-                $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
-                $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
-                $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
-                $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
-                $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
-                $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
-                $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
-                $smt->bindParam(':data_id', $data_id, PDO::PARAM_INT);
-                $smt->execute();
+        try {
+            // データの更新
+            $smt = $this->pdo->prepare(
+                'UPDATE user_physical_datas SET weight = :weight,fat_percentage = :fat_percentage,muscle_mass = :muscle_mass,water_content = :water_content,visceral_fat = :visceral_fat,basal_metabolic_rate = :basal_metabolic_rate,bmi = :bmi,updated_at = now() WHERE data_id = :data_id'
+            );
+            $smt->bindParam(':weight', $_POST['weight'], PDO::PARAM_STR);
+            $smt->bindParam(':fat_percentage', $_POST['fat_percentage'], PDO::PARAM_STR);
+            $smt->bindParam(':muscle_mass', $_POST['muscle_mass'], PDO::PARAM_STR);
+            $smt->bindParam(':water_content', $_POST['water_content'], PDO::PARAM_STR);
+            $smt->bindParam(':visceral_fat', $_POST['visceral_fat'], PDO::PARAM_STR);
+            $smt->bindParam(':basal_metabolic_rate', $_POST['basal_metabolic_rate'], PDO::PARAM_STR);
+            $smt->bindParam(':bmi', $_POST['bmi'], PDO::PARAM_STR);
+            $smt->bindParam(':data_id', $data_id, PDO::PARAM_INT);
+            $smt->execute();
 
-            } catch (PDOException $e) {
-                echo 'データの更新が出来ませんでした。' . $e->getMessage();
-            }
+        } catch (PDOException $e) {
+            echo 'データの更新が出来ませんでした。' . $e->getMessage();
+        }
     }
 
     /**
      * データリストをDBから読み込み
      *
      * @param int $user_id
-     * @param int $term
      * @return array
      */
-    function getPhysicalDataList($user_id, $term)
+    function getPhysicalDataList($user_id)
     {
-        $now_time = date('Y-m-d H:i:s');
-
-        $term_time = date('Y-m-d H:i:s', time() - ($term * 24 * 60 * 60));
-
         try {
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 AND created_at BETWEEN :term_time AND :now_time ORDER BY created_at DESC'
+                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
             );
             $smt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $smt->bindParam(':term_time', $term_time, PDO::PARAM_STR);
-            $smt->bindParam(':now_time', $now_time, PDO::PARAM_STR);
             $smt->execute();
             // 実行結果を配列に返す。
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
