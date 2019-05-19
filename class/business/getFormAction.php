@@ -5,6 +5,10 @@ class getFormAction
 
     public $pdo;
 
+    const FLAG_ON = 1;
+
+    const FLAG_OFF = 0;
+
     /**
      * コネクション確保
      */
@@ -87,17 +91,25 @@ class getFormAction
             $member_id = $_POST["member_id"];
             $password = $_POST["password"];
 
-            // 2. エラー処理
+            $statusOn = self::FLAG_ON;
+
             try {
                 $smt = $this->pdo->prepare(
-                    'SELECT user_id FROM user_users WHERE password = :password'
+                    'SELECT user_id, member_id FROM user_users WHERE password = :password AND status = :status'
                 );
-//                $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
                 $smt->bindParam(':password', $password, PDO::PARAM_INT);
+                $smt->bindParam(':status', $statusOn, PDO::PARAM_INT);
                 $smt->execute();
 
                 // 実行結果を配列に返す。
                 $result = $smt->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($result[0]['member_id'] == null){
+                    $this->getLoginFix($member_id, $password);
+                } elseif($result[0]['member_id'] != $member_id) {
+                    echo $errorMessage = '会員IDとパスワードの組み合わせが異なります。';
+                    exit;
+                }
 
                 if ($result[0]['user_id'] == null){
                     echo $errorMessage = 'ログインに失敗しました。';
@@ -109,6 +121,26 @@ class getFormAction
             } catch (PDOException $e) {
                 echo 'データベースエラー' . $e->getMessage();
             }
+        }
+    }
+
+    /**
+     * 暫定修正用:
+     *
+     */
+    function getLoginFix($member_id, $password)
+    {
+        try {
+            // 登録データ取得
+            $smt = $this->pdo->prepare(
+                'UPDATE `user_users` SET member_id = :member_id WHERE password = :password'
+            );
+            $smt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
+            $smt->bindParam(':password', $password, PDO::PARAM_INT);
+            $smt->execute();
+
+        } catch (PDOException $e) {
+            echo '修正エラーです。' . $e->getMessage();
         }
     }
 
