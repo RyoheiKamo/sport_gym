@@ -251,16 +251,24 @@ class getFormAction
      * データリストをDBから読み込み
      *
      * @param int $user_id
+     * @param int $number
      * @return array
      */
-    function getPhysicalDataList($user_id)
+    function getPhysicalDataList($user_id, $number)
     {
         try {
+            $date = new DateTime();
+
+            $now_date = $date->format('Y-m-d H:i:s');
+            $before_date = $date->modify('-'.$number.' days')->format('Y-m-d H:i:s');
+
             // 登録データ取得
             $smt = $this->pdo->prepare(
-                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 ORDER BY created_at DESC limit 20'
+                'SELECT * FROM user_physical_datas WHERE user_id = :user_id AND delete_flag = 0 AND created_at BETWEEN :before_date AND :now_date ORDER BY created_at DESC'
             );
             $smt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $smt->bindParam(':now_date', $now_date, PDO::PARAM_STR);
+            $smt->bindParam(':before_date', $before_date, PDO::PARAM_STR);
             $smt->execute();
             // 実行結果を配列に返す。
             $result = $smt->fetchAll(PDO::FETCH_ASSOC);
